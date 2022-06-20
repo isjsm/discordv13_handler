@@ -1,72 +1,46 @@
-const { Client, Intents, Collection, MessageEmbed } = require('discord.js');
-const {readdirSync} = require('fs');
-const Discord = require('discord.js');
+const { prefix, embedColor } = require('./src/config');
+const { Client, Collection } = require('discord.js');
+const client = new Client({ intents: ["GUILDS", "GUILD_MESSAGES", "DIRECT_MESSAGES"] });
+const mongoose = require('mongoose');
+const { readdirSync } = require('fs');
+const events = readdirSync('events');
 
+SetUp(client);
 
+function SetUp (client) {
+  client.commands = new Collection();
+  client.languages = (readdirSync('./src/languages')).map(e => e.split('.')[0]);
+  client.embedColor = embedColor;
 
+  events.filter(e => e.endsWith('.js')).forEach(event => {
+    event = require(`./events/${event}`)(client);
+    event.once ? client.once(event.name, event.execute) : client.on(event.name, event.execute);
+  });
 
+  events.filter(e => !e.endsWith('.js')).forEach(folder => {
+    readdirSync('./events/' + folder).forEach(event => {
+      event = require(`./events/${folder}/${event}`)(client);
+      event.once ? client.once(event.name, event.execute) : client.on(event.name, event.execute);
+    });
+  });
 
-
-const client = new Client({
- allowedMentions: { parse: ['users', 'roles'], repliedUser: false },
-    intents: [
-    Intents.FLAGS.GUILDS, 
-    Intents.FLAGS.GUILD_MEMBERS, 
-    Intents.FLAGS.GUILD_BANS, 
-    Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS, 
-    Intents.FLAGS.GUILD_INTEGRATIONS, 
-    Intents.FLAGS.GUILD_WEBHOOKS, 
-    Intents.FLAGS.GUILD_INVITES, 
-    Intents.FLAGS.GUILD_VOICE_STATES, 
-    Intents.FLAGS.GUILD_PRESENCES, 
-    Intents.FLAGS.GUILD_MESSAGES, 
-    Intents.FLAGS.GUILD_MESSAGE_REACTIONS, 
-    Intents.FLAGS.GUILD_MESSAGE_TYPING, 
-    Intents.FLAGS.DIRECT_MESSAGES, 
-    Intents.FLAGS.DIRECT_MESSAGE_REACTIONS,
-    Intents.FLAGS.DIRECT_MESSAGE_TYPING
-    ]
-});
-
-
-
-
-
-
-client.cooldowns = new Discord.Collection();
-client.commands = new Collection();
-
-
-//commands file
-const commandFolders = readdirSync('./commands');
-
-for (const folder of commandFolders) {
-	const commandFiles = readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
-	for (const file of commandFiles) {
-		const command = require(`./commands/${folder}/${file}`);
-		client.commands.set(command.name, command);
-	}
-}
-
-//events file
-const eventFiles = readdirSync('./events').filter(file => file.endsWith('.js'));
-
-for (const file of eventFiles) {
-	const event = require(`./events/${file}`);
-	if (event.once) {
-		client.once(event.name, (...args) => event.execute(...args, client));
-	} else {
-		client.on(event.name, (...args) => event.execute(...args, client));
-	}
+  for (let folder of readdirSync('commands').filter(folder => !folder.includes('.'))) {
+    for (let file of readdirSync('commands/' + folder).filter(f => f.endsWith('.js'))) {
+      let command = require(`./commands/${folder}/${file}`);
+      command.category = folder;
+      client.commands.set(command.name, command);
+    }
+  }
 }
   
+mongoose.connect(process.env.DB, { useNewUrlParser: true, useUnifiedTopology: true }).then(async (result) => {
+  try {
+    await client.login(process.env.TOKEN);
+  } catch (err) {
+    console.error(err);
+  } 
+}).catch(err => console.error(err));
 
-	
+require('./src/util');
 
-  
-	
-  
-  
-
-client.login(process.env.TOKEN);
-
+module.exports.SetUp = SetUp;
