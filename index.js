@@ -48,7 +48,8 @@ module.exports.SetUp = SetUp;
 
 /* Chat ...
 
+لا كله جاهز
 
-
-
+جميل بس فاضل ال schema 
+جميل البوت بيرد
 */
