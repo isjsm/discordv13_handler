@@ -12,4 +12,5 @@ module.exports = {
       "name": `${prefix}help`
     }]
   }
+  
 };

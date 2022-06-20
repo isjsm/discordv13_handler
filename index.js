@@ -35,6 +35,7 @@ function SetUp (client) {
   
 mongoose.connect(process.env.DB, { useNewUrlParser: true, useUnifiedTopology: true }).then(async (result) => {
   try {
+    console.log('connected to database');
     await client.login(process.env.TOKEN);
   } catch (err) {
     console.error(err);
@@ -44,3 +45,10 @@ mongoose.connect(process.env.DB, { useNewUrlParser: true, useUnifiedTopology: tr
 require('./src/util');
 
 module.exports.SetUp = SetUp;
+
+/* Chat ...
+
+
+
+
+*/
