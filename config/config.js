@@ -1,1 +1,4 @@
-module.expo
+module.exports ={ 
+prefix: '!',
+
+}

@@ -31,6 +31,8 @@ const client = new Client({
 
 
 
+
+
 client.cooldowns = new Discord.Collection();
 client.commands = new Collection();
 
