@@ -2,9 +2,6 @@
   "name": "discordbot",
   "version": "1.0.0",
   "description": "discord bot",
-  "creators": [
-    "Shadi Hakimi"
-  ],
   "main": "index.js",
   "dependencies": {
     "mongoose": "^6.3.4",
