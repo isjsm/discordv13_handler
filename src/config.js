@@ -3,7 +3,7 @@ const prefix = "$";
 module.exports = {
   prefix,
   language: 'en',
-  owners: ["806426044747350017"],
+  owners: ["776806785214054401"],
   embedColor: `BLUE`,
   "presence": {
     "status": `dnd`,
